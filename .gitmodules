@@ -1,0 +1,3 @@
+[submodule "code/DistributedRedditAnalyser"]
+	path = code/DistributedRedditAnalyser
+	url = git@github.com:majcn/DistributedRedditAnalyser.git
