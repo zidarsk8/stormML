@@ -1,0 +1,116 @@
+\documentclass[journal]{IEEEtran/IEEEtran}
+
+\usepackage[utf8x]{inputenc}
+\usepackage{cite}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{verbatim}
+\usepackage{epstopdf}
+\usepackage{amssymb}
+\usepackage[pdftex]{graphicx}
+\graphicspath{{img/}}
+\DeclareGraphicsExtensions{.eps,.pdf,.png,.jpg,.jpeg}
+\usepackage[cmex10]{amsmath}
+\usepackage{array}
+
+\usepackage{fancyvrb}
+\DefineVerbatimEnvironment{code}{Verbatim}{fontsize=\small}
+
+
+% correct bad hyphenation here
+\hyphenation{op-tical net-works semi-conduc-tor}
+
+\begin{document}
+\title{Stream Data Analisys and Data Mining With Twitter Storm}
+
+\author{Gregor~Majcen, Miha~Zidar}%
+\markboth{MLDM Workshop, January~2013}{}
+%\IEEEspecialpapernotice{(Invited Paper)}
+\maketitle
+\begin{abstract}
+    Twitter Storm is a powerfull distributed real time data processing solution, with a wide range of usage. In this paper, we are going to take a look at how we can utilize Twitter Storms power for data mining on streams of data. The main focus of this paper is real time data processing and online data mining.
+\end{abstract}
+
+\begin{IEEEkeywords}
+    online learning, continuous data, data mining, distributed systems, horizontal scaling, batch processing
+\end{IEEEkeywords}
+
+\IEEEpeerreviewmaketitle
+
+
+\section{Introduction}
+\IEEEPARstart{T}{oday} we're generating more information per second than ever before, and the amount of data produced is only increasing over time. Data on its own is not that useful for us, unless we can extract information from it and the speed of gathering that information is becomming more and more valuable. This is where the real time data processing comes in. Big companies like Twitter, Groupon, spider.io and others, are using Twitter Storm to provide a better user experience.\\
+
+In the last few years data processing has come a long way with services like MapReduce, Amazon EMR, Hadoop, and related techologies. All of these were made to handle massive amounts of data, and they do that very affectively. But lately their weakness is showing in their lack of real time processing. Now speed is starting to be ever more important, to get ahead of competition. This is where Storm comes in. Unlike other solutions that work in "batch" mode, Storm is made so it can handle data streams. With that it's possible to get calculations done on tupples and have the results back in matter of seconds, insted of hours or even days.
+Describe what the article contains.
+
+We will begin by explaining how Twitter Storm works, and what it is used for. Then we shell slowly narow down all the Storm uses to the ones that become useful in datamining.
+
+%\hfill mds%?
+\hfill \today
+\section{Twitter Storm}
+\begin{itemize}
+    \item spout
+    \item bolt
+    \item topology
+\end{itemize}
+\subsection{Motivation}
+Before we can start talking about how Twitter Storm can be used, we need to first explain what it actually is and how it came to be.
+
+\subsection{Usage}
+
+\begin{itemize}
+    \item Stream processing - 
+    \item Distributed RPC
+    \item Continous computation
+\end{itemize}
+
+\subsection{Simple Example}
+
+\begin{code}
+N = [0] * n # initial reservoir
+\end{code}
+\subsubsection*{Explanation}
+
+\section{Online machine learning}
+
+\subsection{Introduction}
+
+
+\section{Conclusion}
+
+\appendices
+
+\section*{Acknowledgement}
+The authors would like to thank Matjaž Kukar, PhD Assistant Professor.
+
+
+\begin{thebibliography}{1}
+\bibitem{reservoir85}
+J.~S. Vitter, \emph{Random Sampling with a Reservoir}. \relax Brown University, 1985.
+\bibitem{learning}
+N. Littlestone, \emph{Learning Quickly When Irrelevant Attributes
+Abound: A New Linear-threshold Algorithm}. \relax University of California, 1988
+\bibitem{auc}
+P. Zhao, R. Jing, \emph{Online AUC Maximization} \relax School of Computer Engineering, Nanyang Technological Unoversoty \& Deparment of Computer Science and Engineering, Michigan State University
+\bibitem{kessl}
+R. Kessl, \emph{Parallel algorithms for mining of frequent itemsets} \relax The Faculty of Electrical Engineering, Czech Technical University in Prague
+\bibitem{roc}Hanley, James A. and McNeil, Barbara J. \emph{The meaning and
+use of the area under of receiver operating characteristic
+(roc) curve.} \relax 1982.
+
+\end{thebibliography}
+
+\newpage
+
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{majcn}}]{Gregor Majcen}
+63070199
+\end{IEEEbiography}
+
+% if you will not have a photo at all:
+\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{zidar}}]{Miha Zidar}
+63060317
+\end{IEEEbiography}
+\end{document}
+
+
