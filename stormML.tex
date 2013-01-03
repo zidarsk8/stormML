@@ -21,7 +21,7 @@
 \hyphenation{op-tical net-works semi-conduc-tor}
 
 \begin{document}
-\title{Stream Data Analisys and Data Mining With Twitter Storm}
+\title{Data Stream Analisys and Data Mining With Storm}
 
 \author{Gregor~Majcen, Miha~Zidar}%
 \markboth{MLDM Workshop, January~2013}{}
@@ -41,21 +41,26 @@
 \section{Introduction}
 \IEEEPARstart{T}{oday} we're generating more information per second than ever before, and the amount of data produced is only increasing over time. Data on its own is not that useful for us, unless we can extract information from it and the speed of gathering that information is becomming more and more valuable. This is where the real time data processing comes in. Big companies like Twitter, Groupon, spider.io and others, are using Twitter Storm to provide a better user experience.\\
 
-In the last few years data processing has come a long way with services like MapReduce, Amazon EMR, Hadoop, and related techologies. All of these were made to handle massive amounts of data, and they do that very affectively. But lately their weakness is showing in their lack of real time processing. Now speed is starting to be ever more important, to get ahead of competition. This is where Storm comes in. Unlike other solutions that work in "batch" mode, Storm is made so it can handle data streams. With that it's possible to get calculations done on tupples and have the results back in matter of seconds, insted of hours or even days.
-Describe what the article contains.
+In the last few years data processing has come a long way with services like MapReduce, Amazon EMR, Hadoop, and related techologies. All of these were made to handle massive amounts of data, and they do that very affectively. But lately their weakness is showing in their lack of real time processing. Now speed is starting to be ever more important, to get ahead of competition. This is where Storm comes in. Unlike other solutions that work in "batch" mode, Storm is made so it can handle data streams. With that it's possible to get calculations done on tupples of data and have the results back in matter of seconds, insted of hours or even days. One valuable ability to have, with ever increasing data streams, is scalability. To be more precise, horizontal scalability, where if the data stream grows, we can simply add more nodes withought having to increase the speed of each individual node, and Twitter Storm prodvides that by running on top of Apache Zookeeper cluster.
 
-We will begin by explaining how Twitter Storm works, and what it is used for. Then we shell slowly narow down all the Storm uses to the ones that become useful in datamining.
+We will begin by explaining what Storm is, how it works, and what it is used for. Then we shell slowly narow down all the Storm uses to the ones that become useful in datamining. We will show how a simple storm demo project, and discuss how these concepts can be applied to machine learning. At the end we will look at a practical machine learning algorithm running on Storm.
 
 %\hfill mds%?
 \hfill \today
 \section{Twitter Storm}
+Storm is a distributed and fault-tolerant realtime computation system. It provides a high abstraction layer with witch we can run complex computations on a cluster of computer. Because it runs on top of Zookeeper and has a good messageing system, it provides a good alternative to managing your own cluster with queues and workes. 
+
+It can be used for stream processing, processing messages, updating databases, updating online machine learning models in real time. Other uses also include continuous computation, doing a continuous query on data streams and streaming out the results to users as they are computed, and for distributed RPC.
+
+
+\subsection{Storm structure}
+Befor we can start anything, we need to learn Storms terminology. 
+
 \begin{itemize}
-    \item spout
-    \item bolt
-    \item topology
+    \item spout - this is basically the imput for the entire system, it is the point (or multiple points) where the data streams are connected, so that it generate outputs that bolts can read.
+    \item bolt - a simple operating unit, that recieves and processes data from sprouts or bolts and possibly generates an output stream for other bolts
+    \item topology - a complete Storm structior simmilar to a never ending process. It is composed of spouts and bolts and data streams between them. \ref{topology}
 \end{itemize}
-\subsection{Motivation}
-Before we can start talking about how Twitter Storm can be used, we need to first explain what it actually is and how it came to be.
 
 \subsection{Usage}
 
@@ -68,7 +73,12 @@ Before we can start talking about how Twitter Storm can be used, we need to firs
 \subsection{Simple Example}
 
 \begin{code}
-N = [0] * n # initial reservoir
+        builder.setSpout("RedditPostsReader", new RawRedditSpout());
+
+        builder.setBolt("FilterPostString", new filterBolt()).shuffleGrouping("RedditPostsReader");
+        builder.setBolt("", new ()).shuffleGrouping("");
+
+
 \end{code}
 \subsubsection*{Explanation}
 
@@ -76,6 +86,13 @@ N = [0] * n # initial reservoir
 
 \subsection{Introduction}
 
+\section{Machine learning with Storm}
+
+\subsection{preprocessing}
+
+\subsection{classification}
+
+\subsection{learning}
 
 \section{Conclusion}
 
