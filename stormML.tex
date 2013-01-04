@@ -43,7 +43,7 @@
 
 In the last few years data processing has come a long way with services like MapReduce, Amazon EMR, Hadoop, and related techologies. All of these were made to handle massive amounts of data, and they do that very affectively. But lately their weakness is showing in their lack of real time processing. Now speed is starting to be ever more important, to get ahead of competition. This is where Storm comes in. Unlike other solutions that work in "batch" mode, Storm is made so it can handle data streams. With that it's possible to get calculations done on tupples of data and have the results back in matter of seconds, insted of hours or even days. One valuable ability to have, with ever increasing data streams, is scalability. To be more precise, horizontal scalability, where if the data stream grows, we can simply add more nodes withought having to increase the speed of each individual node, and Twitter Storm prodvides that by running on top of Apache Zookeeper cluster.
 
-We will begin by explaining what Storm is, how it works, and what it is used for. Then we shell slowly narow down all the Storm uses to the ones that become useful in datamining. We will show how a simple storm demo project, and discuss how these concepts can be applied to machine learning. At the end we will look at a practical machine learning algorithm running on Storm.
+We will begin by explaining what Storm is, how it works, and what it is used for. Then we shell slowly narow down all the Storm uses to the ones that become useful in datamining. We will show how a simple storm demo project, and discuss how these concepts can be applied to machine learning. At the end we will look at a practical machine learning algorithm running on Storm, then we'll take that knowlage to hypothesise a solution for the stock market prediction.
 
 %\hfill mds%?
 \hfill \today
@@ -54,13 +54,22 @@ It can be used for stream processing, processing messages, updating databases, u
 
 
 \subsection{Storm structure}
-Befor we can start anything, we need to learn Storms terminology. 
+Befor we can start anything, we need to learn Storms terminology. Even though Storm is oftene refered as Hadoop in real-time, the fact that it handles data streams and does not by it self store data or even finishes proceesing, means that it can not be compared to it or any other batch method. That is why storm does not have processes, but it calls those topologies, since unlike a process, those never finish. The two main parts of topologies are sprouts and bolts. 
 
 \begin{itemize}
-    \item spout - this is basically the imput for the entire system, it is the point (or multiple points) where the data streams are connected, so that it generate outputs that bolts can read.
+    \item spout - this is basically the input for the entire system, it is the point (or multiple points) where the outside data streams are connected. The main task is to fetch data and convert it so that bolts can access it.
     \item bolt - a simple operating unit, that recieves and processes data from sprouts or bolts and possibly generates an output stream for other bolts
-    \item topology - a complete Storm structior simmilar to a never ending process. It is composed of spouts and bolts and data streams between them. \ref{topology}
+    \item topology - a complete Storm structor simmilar to a never ending process. It is composed of spouts and bolts and data streams between them. \ref{topology}
 \end{itemize}
+
+
+\begin{figure}[htbp]
+    \begin{center}
+        \includegraphics[scale=0.45]{img/topology.png}
+        \caption{Storm structor}
+        \label{topology}
+    \end{center}
+\end{figure}
 
 \subsection{Usage}
 
@@ -84,13 +93,23 @@ Befor we can start anything, we need to learn Storms terminology.
 
 \section{Online machine learning}
 
+Online machine learning, is an induction model for learning from one instance at a time. This makes online algorithems perfect for data streams, since the model can be easily and constantly adjusted to acomodate for the newer data. As long as a good clasifier exists, the online algorithem will eventually learn to make better predictions. Online algorithems work with a sequence of trials, each of those can be represented with three steps. In the first step, the algorithm receives an instance, then in the second step, it predicts the label of the instance, and in the last step the algorithm receives the true label of the instance. The third step then also corrects the hypothesis to minimize the error, hopefully to make better predictions for future trials. 
+
+One drawback of these algorithems, is the need for more and more correctly labeled examples from which the algorithem would learn. This ofcourse is not possible, when correctly labeling an example costs money and time. Fortunately there are a lot of problems where the correct label is always available. For example any problem that has to do with predicting the future. In those problems the label will eventually be available and the algorithem will be able adjust its model to compensate the new data. A case of a future prediction problem would be movements on the stock market, or finding the next trending topic on twitter.
+
+A few popular online machine learning algorithems are \textit{perceptoron}, \textit{winnow} and \textit{naive bayes}. 
+
 \subsection{Introduction}
 
 \section{Machine learning with Storm}
 
-\subsection{preprocessing}
+As we have seen in the previous sections, Storm is a very powerful tool, used for a lot of different purposes. In this section, we will see implications Storm has in the data mining field. 
 
-\subsection{classification}
+\subsection{preprocessing}
+Storm topologies can be used for machine learning indirectly, just for data preprocessing before running the data on a machine learning algorithem. The most common use for this would be video analizing, image streams such as tumblr, or any other data type that needs preprocessing before any classification or regression can be done.
+
+\subsection{prediction}
+For this use case, Storm would act as distributed RPC that would just classify each instance from a given fixed model. 
 
 \subsection{learning}
 
