@@ -39,37 +39,62 @@
 
 
 \section{Introduction}
-\IEEEPARstart{T}{oday} we're generating more information per second than ever before, and the amount of data produced is only increasing over time. Data on its own is not that useful for us, unless we can extract information from it and the speed of gathering that information is becomming more and more valuable. This is where the real time data processing comes in. Big companies like Twitter, Groupon, spider.io and others, are using Twitter Storm to provide a better user experience.\\
+\IEEEPARstart{T}{oday} we are generating more data per second than ever before, and the amount of data produced is only increasing over time. Data on its own is not that useful for us, unless we can extract information from it and the speed of gathering that information is becomming more and more valuable. This is where the real time data processing comes in. Big companies like Twitter, Groupon, spider.io and others, are using Twitter Storm to provide a better user experience.\\
 
 In the last few years data processing has come a long way with services like MapReduce, Amazon EMR, Hadoop, and related techologies. All of these were made to handle massive amounts of data, and they do that very affectively. But lately their weakness is showing in their lack of real time processing. Now speed is starting to be ever more important, to get ahead of competition. This is where Storm comes in. Unlike other solutions that work in "batch" mode, Storm is made so it can handle data streams. With that it's possible to get calculations done on tupples of data and have the results back in matter of seconds, insted of hours or even days. One valuable ability to have, with ever increasing data streams, is scalability. To be more precise, horizontal scalability, where if the data stream grows, we can simply add more nodes withought having to increase the speed of each individual node, and Twitter Storm prodvides that by running on top of Apache Zookeeper cluster.
+
+Handling large data streams has always been possible even without Storm, but that meant handling queues and workers and dispatchers. Usually those present a problem with scaling, since dispatchers have to be modified to support new queues for the new workers. Thus a lot of the work with such system is just to keep the system running, insted of actually working on the logic of the workers. Storm keeps our focus on the actual logic of the topology, and it hadles the queues and dispatchers so we do not have to. \\
 
 We will begin by explaining what Storm is, how it works, and what it is used for. Then we shell slowly narow down all the Storm uses to the ones that become useful in datamining. We will show how a simple storm demo project, and discuss how these concepts can be applied to machine learning. At the end we will look at a practical machine learning algorithm running on Storm, then we'll take that knowlage to hypothesise a solution for the stock market prediction.
 
 %\hfill mds%?
 \hfill \today
 \section{Twitter Storm}
-Storm is a distributed and fault-tolerant realtime computation system. It provides a high abstraction layer with witch we can run complex computations on a cluster of computer. Because it runs on top of Zookeeper and has a good messageing system, it provides a good alternative to managing your own cluster with queues and workes. 
+Storm is a distributed and fault-tolerant realtime computation system. It provides a high abstraction layer with witch we can run complex computations on a cluster of computer. Storm provides users witha general framework for performing computataions on data streams in real-timem, simmilar to how Hadoop provides users with a framework for performing batch processing operations. Because it runs on top of Zookeeper and has a good messageing system using tupples of data, it provides a good alternative to managing your own cluster with queues and workes. \\
 
-It can be used for stream processing, processing messages, updating databases, updating online machine learning models in real time. Other uses also include continuous computation, doing a continuous query on data streams and streaming out the results to users as they are computed, and for distributed RPC.
+Storm can be used for stream processing, processing messages, updating databases, updating online machine learning models in real time. Other uses also include continuous computation, doing a continuous query on data streams and streaming out the results to users as they are computed, and for distributed RPC.
 
 
 \subsection{Storm structure}
-Befor we can start anything, we need to learn Storms terminology. Even though Storm is oftene refered as Hadoop in real-time, the fact that it handles data streams and does not by it self store data or even finishes proceesing, means that it can not be compared to it or any other batch method. That is why storm does not have processes, but it calls those topologies, since unlike a process, those never finish. The two main parts of topologies are sprouts and bolts. 
+Befor we can start anything, we need to learn Storms terminology. Even though Storm is oftene refered as Hadoop in real-time, the fact that it handles data streams and does not by it self store data or even finishes proceesing, means that it can not be compared to it or any other batch method. That is why storm does not have processes, but it calls those topologies, which unlike a process never finish.\\
+
+The two main parts of topologies are sprouts and bolts. Each spout and bolt runs in multiple instances called taskes\ref{tasks}, that are distributed on a storm cluster\ref{stormcluster}. The number of task given to a bolt is determened in our program and is does not depend on the underlying structor of the Storm cluster. That makes adding and removing nodes from the cluster easy and requires no extra programming work. \\
 
 \begin{itemize}
-    \item spout - this is basically the input for the entire system, it is the point (or multiple points) where the outside data streams are connected. The main task is to fetch data and convert it so that bolts can access it.
-    \item bolt - a simple operating unit, that recieves and processes data from sprouts or bolts and possibly generates an output stream for other bolts
-    \item topology - a complete Storm structor simmilar to a never ending process. It is composed of spouts and bolts and data streams between them. \ref{topology}
-\end{itemize}
+    \item \textbf{spout} - this is basically the input for the entire system, it is the point (or multiple points) where the outside data streams are connected. The main task is to fetch data and convert it to tuples so that bolts can access it. For example, spout could read from a Kestrel queue, Twitter streaming API, directly read some sensor, or it could even scrape data from the web.
+    \item \textbf{bolt} - a simple operating unit, that recieves and processes data from sprouts or bolts and possibly generates an output stream for other bolts. Bolts can be simple functions that modify, filter, aggregate or join data, or talk to databases. 
+    \item \textbf{stream} - unbound sequence of tiples that is created and processed in a parallel using a distributed cluster. Streams are used to connect spouts and bolts.
+    \item \textbf{topology} - a complete Storm structor simmilar to a never ending process. It is composed of spouts and bolts which are connected with data streams between them. \ref{topology}
+\end{itemize} 
+\ \\
+
+Storm topologies run on top of Storm cluster \ref{stormcluster}. A Storm cluster is made up of two kinds of nodes: the master node and the worker nodes. The master node runs a daemon called \textit{Nimbus} which distributes the code to worker nodes around the cluster, assignes tasks to individual machines and monitors to faliures. Every worker node runs a daemon called \textit{Supervisor} that listens for work assigned to it by Nimbus and starts or stops worker processes to do the assigned task. The coordination between Nimbus and Supervisors is done through a Zookeeper cluster.
 
 
 \begin{figure}[htbp]
     \begin{center}
         \includegraphics[scale=0.45]{img/topology.png}
-        \caption{Storm structor}
+        \caption{Storm topology structor}
         \label{topology}
     \end{center}
 \end{figure}
+
+\begin{figure}[htbp]
+    \begin{center}
+        \includegraphics[scale=0.45]{img/tasks.png}
+        \caption{Spouts and Bolts running as task and connected with streams.}
+        \label{tasks}
+    \end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+    \begin{center}
+        \includegraphics[scale=0.45]{img/storm-cluster.png}
+        \caption{Storm cluster}
+        \label{stormcluster}
+    \end{center}
+\end{figure}
+
 
 \subsection{Usage}
 
@@ -82,10 +107,11 @@ Befor we can start anything, we need to learn Storms terminology. Even though St
 \subsection{Simple Example}
 
 \begin{code}
-        builder.setSpout("RedditPostsReader", new RawRedditSpout());
-
-        builder.setBolt("FilterPostString", new filterBolt()).shuffleGrouping("RedditPostsReader");
-        builder.setBolt("", new ()).shuffleGrouping("");
+     
+    sample code:
+        do somethign
+   
+ 
 
 
 \end{code}
@@ -115,6 +141,7 @@ For this use case, Storm would act as distributed RPC that would just classify e
 
 \section{Conclusion}
 
+\newpage
 \appendices
 
 \section*{Acknowledgement}
@@ -122,18 +149,7 @@ The authors would like to thank Matjaž Kukar, PhD Assistant Professor.
 
 
 \begin{thebibliography}{1}
-\bibitem{reservoir85}
-J.~S. Vitter, \emph{Random Sampling with a Reservoir}. \relax Brown University, 1985.
-\bibitem{learning}
-N. Littlestone, \emph{Learning Quickly When Irrelevant Attributes
-Abound: A New Linear-threshold Algorithm}. \relax University of California, 1988
-\bibitem{auc}
-P. Zhao, R. Jing, \emph{Online AUC Maximization} \relax School of Computer Engineering, Nanyang Technological Unoversoty \& Deparment of Computer Science and Engineering, Michigan State University
-\bibitem{kessl}
-R. Kessl, \emph{Parallel algorithms for mining of frequent itemsets} \relax The Faculty of Electrical Engineering, Czech Technical University in Prague
-\bibitem{roc}Hanley, James A. and McNeil, Barbara J. \emph{The meaning and
-use of the area under of receiver operating characteristic
-(roc) curve.} \relax 1982.
+\bibitem{storm} authors \emph{title} \relax year.
 
 \end{thebibliography}
 
