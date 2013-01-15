@@ -62,10 +62,17 @@ Befor we can start anything, we need to learn Storms terminology. Even though St
 The two main parts of topologies are sprouts and bolts. Each spout and bolt runs in multiple instances called taskes \ref{tasks}, that are distributed on a storm cluster \ref{stormcluster}. The number of task given to a bolt is determened in our program and is does not depend on the underlying structure of the Storm cluster. That makes adding and removing nodes from the cluster easy and requires no extra programming work. Another useful feature of Storm is that both spots and bolts can be writen in any more popular programming language, as long as the code provides a simple API that the storm can use for comunication. \\
 
 \begin{itemize}
-    \item \textbf{spout} - this is basically the input for the entire system, it is the point (or multiple points) where the outside data streams are connected. The main task is to fetch data and convert it to tuples so that bolts can access it. For example, spout could read from a Kestrel queue, Twitter streaming API, directly read some sensor, or it could even scrape data from the web.
-    \item \textbf{bolt} - a simple operating unit, that recieves and processes data from sprouts or bolts and possibly generates an output stream for other bolts. Bolts can be simple functions that modify, filter, aggregate or join data, or talk to databases. 
-    \item \textbf{stream} - unbound sequence of tuples that is created and processed in a parallel using a distributed cluster. Streams are used to connect spouts and bolts. Since spouts and bolts run in multiple tasks, \textit{Stream Grouping} defines how a stream is being partitioned between those tasks. Storm supports four types of stream groupings; \textit{Shuffle grouping} - picks a random task, \textit{Fields grouping} - mod hashing on a subset of tuple fields, \textit{All grouping} - send to all tasks, \textit{Global grouping} - pick task with lowest id
-    \item \textbf{topology} - a complete Storm structor similar to a never ending process. It is composed of spouts and bolts which are connected with data streams between them. \ref{topology}
+    \item \textbf{spout} - this is basically the input for the entire system, it is the point (or multiple points) where the outside data streams are connected. The main task is to fetch data and convert it to tuples so that bolts can access it. For example, spout could read from a Kestrel queue, Twitter streaming API, directly read some sensor, or it could even scrape data from the web.\\
+    \item \textbf{bolt} - a simple operating unit, that recieves and processes data from sprouts or bolts and possibly generates an output stream for other bolts. Bolts can be simple functions that modify, filter, aggregate or join data, or talk to databases. \\
+    \item \textbf{stream} - unbound sequence of tuples that is created and processed in a parallel using a distributed cluster. Streams are used to connect spouts and bolts. Since spouts and bolts run in multiple tasks, \textit{Stream Grouping} defines how a stream is being partitioned between those tasks. Storm supports four types of stream groupings:
+        \begin{itemize}
+            \item \textit{Shuffle grouping} - picks a random task, 
+            \item \textit{Fields grouping} - mod hashing on a subset of tuple fields, 
+            \item \textit{All grouping} - send to all tasks, 
+            \item \textit{Global grouping} - pick task with lowest id
+        \end{itemize} 
+        \ \\
+    \item \textbf{topology} - a complete Storm structor similar to a never ending process. It is composed of spouts and bolts which are connected with data streams between them. \ref{topology} \\
 \end{itemize} 
 \ \\
 
@@ -102,9 +109,9 @@ Storm topologies run on top of Storm cluster \ref{stormcluster}. A Storm cluster
 There are three basic ways, how Storm can be used, depending on our needs. \\
 
 \begin{itemize}
-    \item \textbf{Stream processing} - processing a stream of new data and updating databases in real-time. Unlike the standard approach of doing stream processing with queues and workers, Storm is fault-tolerant and easily scalable. A use case for data mining would be to have an online learner that we would continously update, so it would always take into considuration the latest data points we have. Since Storm is falut-tolerant, this would mean that we would not loose any knowledge.
-    \item \textbf{Distributed RPC} - computing an intense query on the fly in parallel. With distributed RPC, a Storm topology is a distributed function that you can invoke like a normal function. This could be used to build bigger ensamble models, in a paralell fashion. Another use case would be to classify a data point with a big ensable model, where each classifier would run as an indiptendent task.
-    \item \textbf{Continous computation} - streaming the results of a query to clients to visualize in real-time. An example is streaming trending topics on Twitter into browsers. A use case for this would be if we have a model that can be improved with time, such as a large neural network, or running genetic algorithms.
+    \item \textbf{Stream processing} - processing a stream of new data and updating databases in real-time. Unlike the standard approach of doing stream processing with queues and workers, Storm is fault-tolerant and easily scalable. A use case for data mining would be to have an online learner that we would continously update, so it would always take into considuration the latest data points we have. Since Storm is falut-tolerant, this would mean that we would not loose any knowledge.\\
+    \item \textbf{Distributed RPC} - computing an intense query on the fly in parallel. With distributed RPC, a Storm topology is a distributed function that you can invoke like a normal function. This could be used to build bigger ensamble models, in a paralell fashion. Another use case would be to classify a data point with a big ensable model, where each classifier would run as an indiptendent task.\\
+    \item \textbf{Continous computation} - streaming the results of a query to clients to visualize in real-time. An example is streaming trending topics on Twitter into browsers. A use case for this would be if we have a model that can be improved with time, such as a large neural network, or running genetic algorithms.\\
 \end{itemize}
 
 
@@ -197,21 +204,27 @@ class BoltClass(storm.BasicBolt):
 
 
 \begin{itemize}
-    \item \textbf{preprocessing} - Storm topologies can be used for machine learning indirectly, just for data preprocessing before running the data on a machine learning algorithem. The most common use for this would be video analizing, image streams such as tumblr, or any other data type that needs preprocessing before any classification or regression algorithms can be run.
+    \item \textbf{preprocessing} - Storm topologies can be used for machine learning indirectly, just for data preprocessing before running the data on a machine learning algorithem. The most common use for this would be video analizing, image streams such as tumblr, or any other data type that needs preprocessing before any classification or regression algorithms can be run.\\
 
     \item \textbf{prediction} - For this use case, Storm could be used as a distributed RPC that would classify each instance from a given fixed ensamble model. Here different bolts would perform their classification based on different models and some bolts would take care of stacking. The benifit of using storm here is that it would be trivial to scale such a system to best fit the current demand. 
-
-    \item \textbf{learning} - Used with MOA or any other framework, Storm could help with the learning of online algorithms. The learning bolts would spawn many tasks, to acomodate a stream that would normally be too large for a single machine to handle.
+\\
+    \item \textbf{learning} - Used with MOA or any other framework, Storm could help with the learning of online algorithms. The learning bolts would spawn many tasks, to acomodate a stream that would normally be too large for a single machine to handle.\\
 \end{itemize}
 
 
 \section{Online machine learning}
 
-Online machine learning, is an induction model for learning from one instance at a time. This makes online algorithems perfect for data streams, since the model can be easily and constantly adjusted to acomodate for the newer data. As long as a good clasifier exists, the online algorithem will eventually learn to make better predictions. Online algorithems work with a sequence of trials, each of those can be represented with three steps. In the first step, the algorithm receives an instance, then in the second step, it predicts the label of the instance, and in the last step the algorithm receives the true label of the instance. The third step then also corrects the hypothesis to minimize the error, hopefully to make better predictions for future trials. 
+Online machine learning, is an induction model for learning from one instance at a time. This makes online algorithems perfect for data streams, since the model can be easily and constantly adjusted to acomodate for the newer data. As long as a good clasifier exists, the online algorithem will eventually learn to make better predictions. Online algorithems work with a sequence of trials, each of those can be represented with three steps. In the first step, the algorithm receives an instance, then in the second step, it predicts the label of the instance, and in the last step the algorithm receives the true label of the instance. The third step then also corrects the hypothesis to minimize the error, hopefully to make better predictions for future trials. \\
 
-One drawback of these algorithems, is the need for more and more correctly labeled examples from which the algorithem would learn. This ofcourse is not possible, when correctly labeling an example costs money and time. Fortunately there are a lot of problems where the correct label is always available. For example any problem that has to do with predicting the future. In those problems the label will eventually be available and the algorithem will be able adjust its model to compensate the new data. A case of a future prediction problem would be movements on the stock market, or finding the next trending topic on twitter.
+One drawback of these algorithems, is the need for more and more correctly labeled examples from which the algorithem would learn. This ofcourse is not possible, when correctly labeling an example costs money and time. Fortunately there are a lot of problems where the correct label is always available. For example any problem that has to do with predicting the future. In those problems the label will eventually be available and the algorithem will be able adjust its model to compensate the new data. A case of a future prediction problem would be movements on the stock market, or finding the next trending topic on twitter. \\
 
-A few popular online machine learning algorithems are \textit{perceptoron}, \textit{LASVM}, \textit{winnow} and \textit{naive bayes}. 
+A few popular online machine learning algorithems are:\\
+\begin{itemize}
+    \item \textit{perceptoron} - algorithm for supervised classification of an input into one of seven possible non-binary outputs. The learning algorithm for perceptrons is an online algorithm, which means that it can processes elements in the training set one at a time.\\
+    \item \textit{LASVM} - relies on the traditional “soft margin” SVM formulation, handles noisy data sets, and is nicely related to the SMO algorithm. Experimental evidence on multiple data sets indicates that it reliably reaches competitive test error rates after performing a single pass over the training set.\\
+    \item \textit{winnow} - algorithm for leraning a linear classifier from labeled examples, simmilar to perceptron. The algorithm can be used in the online learning setting, where the learning and the classification phase are not clearly separated.\\
+    \item \textit{naive bayes} - the bayesian online algorithm is a method for estimating parameters using the power of bayesian inference.\\
+\end{itemize}
 
 
 
@@ -222,6 +235,12 @@ MOA is an open source framework for data stream mining. It includes a collection
 \section{Simple example with Storm, Moa and Weka}
 
 As we have seen in the previous sections, Storm is a very powerful tool, used for a lot of different purposes. In this section, we will see implications Storm has in the data mining field. For this we will examine a simple project that tries to classify reddit posts into specific subreddits. The following project serves only as an example, and at the end of this section, we will discuss how these principles can be applied to real world problems.
+
+\subsection{Explanation of the algorithm}
+
+This storm topology, spouts fetch posts from a few subredits and hand them over to classifier bolts. The classifier bolt then takes each touple, which reprisents one learning instance, and trys to correctly classify in which subredit it belongs, and then it updates the classifier with the training instance. In a real world, if we were for example predicting how many upvotes a post will get in the first hour, the delay between the classification and updating the classifier would be bigger. Because of this, we chose a problem, where we would not have to wait as long for updating the classifier. 
+
+\subsection{Spout}
 
 
 
@@ -247,7 +266,10 @@ The authors would like to thank Matjaž Kukar, PhD Assistant Professor.
 \bibitem{ozaboost} Nikunj C. Oza, Stuart Russell \emph{Online Bagging and Boosting} \relax .
 \bibitem{dmreview} Mohamed Medhat Gaber, Arkady Zaslavsky, Shonali Krishnaswamy \emph{Mining Data Streams: A Review} \relax .
 \bibitem{moa} Albert Bifet, Geoff Holmes, Richard Kirkby, Bernhard Pfahringer \emph{Data Stream Mining, A partical approach } \relax 2011.
-\bibitem{tag} aut \emph{title } \relax year.
+\bibitem{winnow} Nick Littlestone \emph{Learning Quickly When Irrelevant Attributes Abound: A New Linear-threshold Algorithm } \relax 1988.
+\bibitem{bayes} Roberto C. Alamino, Nestor Caticha \emph{Bayesian online algorithms for learning in discrete hidden markov models} \relax 2006.
+\bibitem{bayesmit} Manfred Opper \emph{A bayesian approach to online learning} \relax 1998.
+\bibitem{tag} aut \emph{tiyyptle } \relax year.
 
 \end{thebibliography}
 
