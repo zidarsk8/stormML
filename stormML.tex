@@ -224,6 +224,7 @@ A few popular online machine learning algorithems are:\\
     \item \textit{LASVM} - relies on the traditional “soft margin” SVM formulation, handles noisy data sets, and is nicely related to the SMO algorithm. Experimental evidence on multiple data sets indicates that it reliably reaches competitive test error rates after performing a single pass over the training set.\\
     \item \textit{winnow} - algorithm for leraning a linear classifier from labeled examples, simmilar to perceptron. The algorithm can be used in the online learning setting, where the learning and the classification phase are not clearly separated.\\
     \item \textit{naive bayes} - the bayesian online algorithm is a method for estimating parameters using the power of bayesian inference.\\
+    \item \textit{naive bayes multinomial} - simmilar to naive bayes, except that the probability distribution is multinomial, which is good for data that can be turned into counts such as word counts and text.
 \end{itemize}
 
 
@@ -242,7 +243,41 @@ This storm topology, spouts fetch posts from a few subredits and hand them over 
 
 \subsection{Spout}
 
+Reads the imput stream from reddit API. To runn a spout, we provide the information on what subreddits we want to monitor. After the spout has been staretd, it fetches a short history of the posts in each subreddit and then waits for the next post. Because reddit has caching and we can not get each new post as it comes, spouts look like they're gathering data in batches, but it is just a side effect of data selection, reddit API.
 
+\subsection{Bolts}
+
+The example contains four basic types of bolts; preprocessing bolt, classifier and learner, statistics printer, and statistics writer. All of these are connected in a linear fashion. \\
+
+\begin{itemize}
+    \item preprocessing - turnes the fetched reddit post into a word vector.\\
+    \item classifier and learner - for this example we have used naive bayes, naive bayes multinomial and perceptron. they all have simmilar bolts and they all do the same, just with different classifiers. So all the bolts first get a single data instance in form of a tuple containg a word vector and the correct classification class. Then that word vector gets classified with either of the previos three classifiers and then the model gets trained on that data with the correct class. The output tuple from these bolts contains the predicted and the correct class. \\
+    \item statistics printer - calculates the classification accuracy for each classifier and prints it on the screen if storm is running in local or debug mode.\\
+    \item statistics writer - stores the data from the printer to a file. \\
+\end{itemize}
+
+
+\subsection{Results}
+
+These are the results from our simple experiment, with a few thousand reddit posts and paralelism for each learner of 15 tasks, the results show how oniline algorithms can work with storm. To test the online classifiers working with the data stream, we tried running the test on 3 subreddits and on several. It is visible here that perceptron works nicely if the number of classes is low, and failes badly with a higer number of classes. The multinomial bayes performs well on all of the tests. Since this is just a proof oc concept, we did not run it on a data stream large enough to trully test the paralelism offered by Storm framework. This should be done and tested in the future.
+
+
+
+\begin{figure}[htbp]
+    \begin{center}
+        \includegraphics[scale=0.40]{img/tasks.png}
+        \caption{Spouts and Bolts running as task and connected with streams.}
+        \label{tasks}
+    \end{center}
+\end{figure}
+
+\begin{figure}[htbp]
+    \begin{center}
+        \includegraphics[scale=0.70]{img/storm-cluster.png}
+        \caption{Storm cluster}
+        \label{stormcluster}
+    \end{center}
+\end{figure}
 
 
 
@@ -252,6 +287,9 @@ This storm topology, spouts fetch posts from a few subredits and hand them over 
 
 \section{Conclusion}
 
+Storm is a powerful and easy to use framework that can help us distribute the load for analysing a data stream, through our cluster. The hard part remains how to mold a problem in such a way that it can be scaled. If we are to write a simple learner and classifier and have Strom distribute that over 50 nodes, we would just get 50 different models and each case would get classified by just one of those. The prediction by the models could easily be stacked at some later point. If we try to have just one single model that learnes on different tasks running on different nodes, then we would have to do some extra work, since Storm does not have methods to syncronize the same class running on differen tasks. 
+
+If we get our problem separated into different parts, then we are able to harness the full power of Storm, since it can efficiently process all the data. Storm had been benchmarked at processing one million 100 byte messages per second per node on a double Intel processor running at 2.4gh and with 24GB of memory. 
 
 
 \appendices
